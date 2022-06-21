@@ -64,4 +64,7 @@ if __name__ == '__main__':
     print(url_main)
     print(url_main.urls)
     print(len(url_main))
-    url_main.print_urls()
+
+    url_crawler = Url('https://crawler-test.com/')
+    url_crawler.print_urls()
+    print(len(url_crawler))
