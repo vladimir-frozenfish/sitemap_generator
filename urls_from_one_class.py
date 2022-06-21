@@ -7,12 +7,13 @@ import requests
 
 
 class Url:
-    def __init__(self, url):
+    def __init__(self, url, parent=None):
         self.url = url
+        self.parent = parent
         self.urls = self.get_urls()
 
     def __str__(self):
-        return self.url
+        return self.url if self.parent is None else f'{self.parent} -> {self.url}'
 
     def __len__(self):
         return len(self.urls)
@@ -47,6 +48,9 @@ class Url:
             # проверка ссылки на относительность
             if href.startswith('/'):
                 urls.add(self.url.rstrip('/') + href)
+            # проверка ссылки на пагинацию и дополлнительные параметры
+            elif href.startswith('?'):
+                urls.add(self.url.rstrip('/') + '/' + href)
             else:
                 urls.add(href)
 
@@ -60,11 +64,19 @@ class Url:
 
 
 if __name__ == '__main__':
+    url_yatube = Url('http://frozenfish.pythonanywhere.com/')
+    print(len(url_yatube))
+    url_yatube.print_urls()
+
+    '''
     url_main = Url('http://google.com')
     print(url_main)
     print(url_main.urls)
     print(len(url_main))
 
-    url_crawler = Url('https://crawler-test.com/')
+    url_crawler = Url('https://crawler-test.com/', url_main)
     url_crawler.print_urls()
     print(len(url_crawler))
+    print(url_crawler)
+    '''
+
