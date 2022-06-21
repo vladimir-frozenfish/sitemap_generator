@@ -1,0 +1,7 @@
+﻿.venv
+venv/
+venv.bak/
+
+.idea
+
+temp.py
