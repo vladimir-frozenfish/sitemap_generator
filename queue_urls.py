@@ -7,7 +7,7 @@ def main():
     urls_deque = deque()    # очередь для добавления классов страниц
     links_set = set()       # множество ссылок для сравнения
 
-    url_main = Url('https://thecode.media')
+    url_main = Url('https://yandex.ru')
     # url_main = Url('http://crawler-test.com/')
     # url_main = Url('https://github.com/')
     # url_main = Url('http://frozenfish.pythonanywhere.com')
