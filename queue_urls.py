@@ -21,8 +21,8 @@ def main():
     # url_main = Url('https://www.google.com')
     # url_main = Url('https://stackoverflow.com/')
 
-    save_file = SaveToFile(url_main.domain)        # класс записи данных в файлы
-    save_file.create_directory()                # создание папки для записи файлов
+    save_file = SaveToFile(url_main.domain)         # класс записи данных в файлы
+    save_file.create_directory()                    # создание папки для записи файлов
     save_file.save_to_log(f'---------------------Построение карты сайта {url_main}\n'
                           f'---------------------Начало работы - {time.asctime()}')
 
@@ -31,7 +31,7 @@ def main():
 
     count = 0
     while count < len(urls_deque):
-        timing_one_page.start()             # отсчет времени для обработки одной страницы
+        timing_one_page.start()                     # отсчет времени для обработки одной страницы
 
         current_url = urls_deque[count]
 

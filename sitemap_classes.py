@@ -16,7 +16,6 @@ class Url:
         self.url = url if url.endswith('/') else url + '/'
         self.parent = parent
         self.domain = self.get_domain()
-        # self.links = self.get_links()
         self.links = set()
 
     def __str__(self):
@@ -57,9 +56,7 @@ class Url:
         в атрибут класса links - изначально это множетво пустое"""
         html_text = self.get_html_text()
 
-        # links = set()
         start_find = 0
-
         while True:
             index_a_start = html_text.find('<a ', start_find)
             if index_a_start == -1:
