@@ -21,7 +21,3 @@ class LinkFinder(HTMLParser):
 
     def error(self, message):
         pass
-
-url_yatube = LinkFinder('http://frozenfish.pythonanywhere.com/')
-print(url_yatube)
-print(url_yatube.links)
