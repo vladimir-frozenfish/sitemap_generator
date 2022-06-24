@@ -31,10 +31,13 @@ class Url:
     def get_domain(self):
         """возвращает имя домена или None,
         если в ссылке домена нет (напрмер mailto:....)"""
+        return parse.urlparse(self.url).netloc
+        '''
         subdomain = parse.urlparse(self.url).netloc.split('.')
         if subdomain == ['']:
             return None
         return '.'.join(subdomain[-2:])
+        '''
 
     def get_response(self):
         headers = {
@@ -95,8 +98,11 @@ class Url:
             # добавление ссылки во множество, если ссылка относительная
             # или с параметрами, то соединяется с базовой
             link = parse.urljoin(self.url, href)
-            if link != self.url:
-                self.links.add(link)
+            # пробуем варинат занесения ссылок без параметров GET
+            link = parse.urlparse(link)
+            link_without_get = link.scheme + "://" + link.netloc + link.path
+            if link_without_get != self.url:
+                self.links.add(link_without_get)
 
             start_find = index_a_end + 4
 
@@ -153,35 +159,12 @@ class SaveToFile:
 
 
 if __name__ == '__main__':
-    # base_url = 'https://invalid.crawler-test.com/'
-    base_url = 'https://support.google.com/googlehome/community/'
 
 
-    url = Url(base_url)
-    print(url.is_redirect())
-    print(url.response.url)
-    url.url = url.response.url
-    print(url.get_domain())
-    print(url.domain)
-
-
-    '''
-    print(url.is_redirect())
-    print('Url: ' + url.url)
-    print('Redirect: ' + url.response.url)
-    url.url = url.response.url
-    print('Url: ' + url.url)
-    print('Redirect: ' + url.response.url)
-    url.get_links()
-    url.print_links()
-    '''
-
-
-    '''
     url_yatube_1 = Url('http://frozenfish.pythonanywhere.com/?page=3')
     url_yatube_1.get_links()
     url_yatube_1.print_links()
-    '''
+
 
     '''
     url_google = Url('https://www.kinopoisk.ru/')
