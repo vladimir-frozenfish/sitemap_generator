@@ -14,6 +14,7 @@ class Url:
     """класс Url"""
     def __init__(self, url, parent=None):
         self.url = url if url.endswith('/') else url + '/'
+        self.response = None
         self.parent = parent
         self.domain = self.get_domain()
         self.links = set()
@@ -33,17 +34,36 @@ class Url:
         subdomain = parse.urlparse(self.url).netloc.split('.')
         if subdomain == ['']:
             return None
-        return subdomain[-2] + '.' + subdomain[-1]
+        return '.'.join(subdomain[-2:])
+
+    def get_response(self):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0'
+        }
+        try:
+            self.response = requests.get(self.url, headers=headers, timeout=5)
+            self. response.encoding = 'utf-8'
+        except:
+            self.response = 'error'
 
     def get_html_text(self):
         if self.url.startswith('mailto:') or self.url.startswith('tel:'):
             return ''
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0'
-        }
-        response = requests.get(self.url, headers=headers)
-        response.encoding = 'utf-8'
-        return response.text
+        if self.response is None:
+            self.get_response()
+        if self.response == 'error':
+            return ''
+        return self.response.text
+
+    def is_redirect(self):
+        """функция возвращает True, если Response, на изначальный Url дает редирект"""
+        if self.response is None:
+            self.get_response()
+        if self.response == 'error':
+            return False
+        if self.response.history:
+            return self.response.history[0].is_redirect
+        return False
 
     def get_link_from_tag(self, tag_a):
         """возвращает ссылку из html-кода <a .... href="..." ..> .... </a>"""
@@ -56,12 +76,17 @@ class Url:
         в атрибут класса links - изначально это множетво пустое"""
         html_text = self.get_html_text()
 
+        if self.is_redirect():
+            self.url = self.response.url
+
         start_find = 0
         while True:
             index_a_start = html_text.find('<a ', start_find)
             if index_a_start == -1:
                 break
             index_a_end = html_text.find('</a>', start_find)
+            if index_a_end == -1:
+                break
 
             # получение ссылки, очищенной от тэгов
             href = self.get_link_from_tag(html_text[index_a_start:index_a_end + 4])
@@ -106,21 +131,9 @@ class Timing:
 
 class SaveToFile:
     def __init__(self, domain):
-        # self.domain = domain
-        # self.directory = self.extraxtion_directory()
         self.directory = domain
         self.log_path = self.directory + '/logs.txt'
         self.links_path = self.directory + '/links.txt'
-
-    '''
-    def extraxtion_directory(self):
-        """формирование имени директории из url"""
-        if self.url.startswith('https://'):
-            dir = self.url.lstrip('https://')
-        elif self.url.startswith('http://'):
-            dir = self.url.lstrip('http://')
-        return dir.lstrip('www.').rstrip('/')
-    '''
 
     def create_directory(self):
         """создание директории"""
@@ -140,11 +153,28 @@ class SaveToFile:
 
 
 if __name__ == '__main__':
+    # base_url = 'https://invalid.crawler-test.com/'
+    base_url = 'https://support.google.com/googlehome/community/'
 
-    url_yatube = Url('https://ads.google.com/intl/ru_ru/home/')
-    url_yatube.get_links()
-    url_yatube.print_links()
-    print(url_yatube.domain)
+
+    url = Url(base_url)
+    print(url.is_redirect())
+    print(url.response.url)
+    url.url = url.response.url
+    print(url.get_domain())
+    print(url.domain)
+
+
+    '''
+    print(url.is_redirect())
+    print('Url: ' + url.url)
+    print('Redirect: ' + url.response.url)
+    url.url = url.response.url
+    print('Url: ' + url.url)
+    print('Redirect: ' + url.response.url)
+    url.get_links()
+    url.print_links()
+    '''
 
 
     '''
