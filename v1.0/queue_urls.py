@@ -13,11 +13,12 @@ def main():
 
     timing_all_job.start()      # отсчет времени всей работы
 
+    # url_main = Url('https://www.susu.ru')
     # url_main = Url('https://vk.com')
     # url_main = Url('https://yandex.ru')
-    # url_main = Url('https://crawler-test.com/')
+    url_main = Url('https://crawler-test.com/')
     # url_main = Url('https://github.com/')
-    url_main = Url('http://frozenfish.pythonanywhere.com')
+    # url_main = Url('http://frozenfish.pythonanywhere.com')
     # url_main = Url('http://frozenfish.site')
     # url_main = Url('https://www.google.com')
     # url_main = Url('https://stackoverflow.com/')
@@ -67,11 +68,11 @@ def main():
         timing_one_page.end()               # конец времени для обработки одной страницы
 
         print(f'Обработано страниц - {count}, '
-              f'Обратотанная страница - {current_url}, '
+              f'Обработанная страница - {current_url}, '
               f'Потрачено времени - {timing_one_page.get_timing()} сек.')
         save_file.save_to_log(f'Обработано страниц - {count}, '
-              f'Обратотанная страница - {current_url}, '
-              f'Потрачено времени - {timing_one_page.get_timing()} сек.')
+                              f'Обработанная страница - {current_url}, '
+                              f'Потрачено времени - {timing_one_page.get_timing()} сек.')
 
 
     print(f'Всего ссылок - {len(urls_deque)}')
@@ -81,6 +82,7 @@ def main():
         print(f'{count}: {url}')
         count += 1
 
+    # запись результатов в текстовый файл
     save_file.save_to_links(urls_deque)
 
     timing_all_job.end()            # конец времени всей работы

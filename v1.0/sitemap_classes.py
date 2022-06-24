@@ -31,13 +31,15 @@ class Url:
     def get_domain(self):
         """возвращает имя домена или None,
         если в ссылке домена нет (напрмер mailto:....)"""
-        return parse.urlparse(self.url).netloc
         '''
+        # возвращает имя домена без субдоменов
         subdomain = parse.urlparse(self.url).netloc.split('.')
         if subdomain == ['']:
             return None
         return '.'.join(subdomain[-2:])
         '''
+        return parse.urlparse(self.url).netloc              # возвращает имя с субдоменами
+
 
     def get_response(self):
         headers = {
