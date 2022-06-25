@@ -1,4 +1,5 @@
 import time
+import multiprocessing
 from collections import deque
 
 from sitemap_classes import Url, Timing, SaveToFile
@@ -6,16 +7,15 @@ from sitemap_classes import Url, Timing, SaveToFile
 
 # URL_MAIN = Url('http://frozenfish.site')
 URL_MAIN = Url('http://frozenfish.pythonanywhere.com')
-URLS_QUEUE = deque()        # очередь для добавления классов страниц
-links_set = set()           # множество ссылок для сравнения
-timing_one_page = Timing()  # класс таймера для замера обработки одной страницы
-timing_all_job = Timing()   # класс таймера для замера времени работы всего кода
-save_file = SaveToFile(URL_MAIN.domain)         # класс записи данных в файлы
+URLS_QUEUE = multiprocessing.Queue()        # очередь для добавления классов страниц
+links_set = set()                           # множество ссылок для сравнения
+timing_one_page = Timing()                  # класс таймера для замера обработки одной страницы
+timing_all_job = Timing()                   # класс таймера для замера времени работы всего кода
+save_file = SaveToFile(URL_MAIN.domain)     # класс записи данных в файлы
 
 
 def current_url_job(current_url):
     """работа с текущей страницей"""
-
     current_url = current_url
 
     print(f'Запрос на страницу {current_url.url}')
@@ -43,7 +43,7 @@ def current_url_job(current_url):
     # проходим по всем ссылкам текущей страницы, если их нету в очереди добавляем как классы в очередь
     for link in current_url.links:
         if link not in links_set:
-            URLS_QUEUE.append(Url(link, current_url))
+            URLS_QUEUE.put(Url(link, current_url))
             links_set.add(link)
 
 
@@ -54,14 +54,14 @@ def main():
     save_file.save_to_log(f'---------------------Построение карты сайта {URL_MAIN}\n'
                           f'---------------------Начало работы - {time.asctime()}')
 
-    URLS_QUEUE.append(URL_MAIN)                     # помещение в очередь начального Url
+    URLS_QUEUE.put(URL_MAIN)                     # помещение в очередь начального Url
     links_set.add(URL_MAIN.url)
 
     count = 0                                       # для подсчета обработанных ссылок
-    while URLS_QUEUE:
+    while URLS_QUEUE.qsize() != 0:
         timing_one_page.start()  # отсчет времени для обработки одной страницы
 
-        current_url = URLS_QUEUE.popleft()
+        current_url = URLS_QUEUE.get()
 
         current_url_job(current_url)
 
