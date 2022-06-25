@@ -65,7 +65,9 @@ def main():
                 links_set.add(link)
         count += 1
 
-        timing_one_page.end()               # конец времени для обработки одной страницы
+        timing_one_page.end()                           # конец времени для обработки одной страницы
+
+        save_file.save_to_shelve(current_url)           # запись в БД current_url
 
         print(f'Обработано страниц - {count}, '
               f'Обработанная страница - {current_url}, '
