@@ -31,11 +31,12 @@ def main():
     urls_deque.append(url_main)
     links_set.add(url_main.url)
 
-    count = 0
-    while count < len(urls_deque):
-        timing_one_page.start()                     # отсчет времени для обработки одной страницы
+    count = 0                                       # для подсчета обработанных ссылок
+    while urls_deque:
+        timing_one_page.start()  # отсчет времени для обработки одной страницы
 
-        current_url = urls_deque[count]
+        current_url = urls_deque.popleft()
+
         print(f'Запрос на страницу {current_url.url}')
         save_file.save_to_log(f'Запрос на страницу {current_url.url}')
 
@@ -49,7 +50,7 @@ def main():
             if not current_url.is_redirect():
                 current_url.get_links()
             else:
-                current_url.url = current_url.response.url          # тогда url равен urlu, который переходит на редирект
+                current_url.url = current_url.response.url  # тогда url равен urlu, который переходит на редирект
                 """если запрос текущего класса url ведет на редирект и 
                 конечный url не находится в словаре ссылок, 
                 то берем ссылки от конечного Urla,
@@ -63,11 +64,12 @@ def main():
             if link not in links_set:
                 urls_deque.append(Url(link, current_url))
                 links_set.add(link)
+
         count += 1
 
-        timing_one_page.end()                           # конец времени для обработки одной страницы
+        timing_one_page.end()  # конец времени для обработки одной страницы
 
-        save_file.save_to_shelve(current_url)           # запись в БД current_url
+        save_file.save_to_shelve(current_url)  # запись в БД current_url
 
         print(f'Обработано страниц - {count}, '
               f'Обработанная страница - {current_url}, '
@@ -76,22 +78,16 @@ def main():
                               f'Обработанная страница - {current_url}, '
                               f'Потрачено времени - {timing_one_page.get_timing()} сек.')
 
-
-    print(f'Всего ссылок - {len(urls_deque)}')
-
-    count = 1
-    for url in urls_deque:
-        print(f'{count}: {url}')
-        count += 1
-
+    '''
     # запись результатов в текстовый файл
     save_file.save_to_links(urls_deque)
+    '''
 
     timing_all_job.end()            # конец времени всей работы
     print(f'\nВремя выполнения работы: {timing_all_job.get_timing()} сек.')
     save_file.save_to_log(f'---------------------Обработка сайта {url_main.url} завершена {time.asctime()}.\n'
                           f'---------------------Время выполнения работы: {timing_all_job.get_timing()} сек.\n'
-                          f'---------------------Всего найдено ссылок - {len(urls_deque)}')
+                          f'---------------------Всего найдено ссылок - {count}')
 
 
 if __name__ == '__main__':
