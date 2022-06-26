@@ -14,15 +14,8 @@ def main():
 
     timing_all_job.start()      # отсчет времени всей работы
 
-    # url_main = Url('https://www.susu.ru')
-    # url_main = Url('https://vk.com')
-    # url_main = Url('https://yandex.ru')
-    # url_main = Url('https://crawler-test.com/')
-    # url_main = Url('https://github.com/')
-    # url_main = Url('http://frozenfish.pythonanywhere.com')
-    # url_main = Url('http://frozenfish.site')
-    # url_main = Url('https://www.google.com')
-    url_main = Url('https://stackoverflow.com/')
+
+    url_main = Url('https://crawler-test.com/')
 
     save_file = SaveToFile(url_main.domain)         # класс записи данных в файлы
     save_file.create_directory()                    # создание папки для записи файлов
