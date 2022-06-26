@@ -8,11 +8,13 @@ from sitemap_classes import Url, Timing, SaveToFile
 # URL_MAIN = Url('http://frozenfish.site')
 URL_MAIN = Url('http://frozenfish.pythonanywhere.com')
 # URL_MAIN = Url('https://crawler-test.com/')
+
 locker = multiprocessing.Lock()
-URLS_QUEUE = deque()                         # очередь для добавления классов страниц
+URLS_QUEUE = deque()                        # очередь для добавления классов страниц
 links_set = set()                           # множество ссылок для сравнения
 timing_one_page = Timing()                  # класс таймера для замера обработки одной страницы
 timing_all_job = Timing()                   # класс таймера для замера времени работы всего кода
+timing_all_job.limit_time = 3000            # установка лимита работы главного цикла в сек
 save_file = SaveToFile(URL_MAIN.domain)     # класс записи данных в файлы
 
 
@@ -71,14 +73,13 @@ def main():
     current_url_job(URL_MAIN)
     links_set.add(URL_MAIN.url)
 
-    while URLS_QUEUE:
+    while URLS_QUEUE and timing_all_job.is_limit():
         print('Работает главный цикл!')
         url_mp = URLS_QUEUE.popleft()
         current_url_job(url_mp)
         # mp1 = multiprocessing.Process(target=current_url_job, args=(url_mp, ), name='mp1')
         # mp1.start()
         # mp1.join()
-
 
         '''
         with multiprocessing.Pool(multiprocessing.cpu_count()*2) as mp:
@@ -90,7 +91,11 @@ def main():
         '''
 
     timing_all_job.end()            # конец времени всей работы
+
     print(f'\nВремя выполнения работы: {timing_all_job.get_timing()} сек. Найдено ссылок - {len(links_set)}')
+    if not timing_all_job.is_limit():
+        print(f'Истек лимит времени на работу программы - {timing_all_job.limit_time} сек.')
+        save_file.save_to_log(f'---------------------Истек лимит времени на работу программы - {timing_all_job.limit_time} сек.')
     save_file.save_to_log(f'---------------------Обработка сайта {URL_MAIN.url} завершена {time.asctime()}.\n'
                           f'---------------------Найдено ссылок - {len(links_set)}'
                           f'---------------------Время выполнения работы: {timing_all_job.get_timing()} сек.\n')

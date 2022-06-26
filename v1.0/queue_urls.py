@@ -10,6 +10,7 @@ def main():
 
     timing_one_page = Timing()  # класс таймера для замера обработки одной страницы
     timing_all_job = Timing()   # класс таймера для замера времени работы всего кода
+    timing_all_job.limit_time = 300  # установка лимита работы главного цикла в сек
 
     timing_all_job.start()      # отсчет времени всей работы
 
@@ -18,10 +19,10 @@ def main():
     # url_main = Url('https://yandex.ru')
     # url_main = Url('https://crawler-test.com/')
     # url_main = Url('https://github.com/')
-    url_main = Url('http://frozenfish.pythonanywhere.com')
+    # url_main = Url('http://frozenfish.pythonanywhere.com')
     # url_main = Url('http://frozenfish.site')
     # url_main = Url('https://www.google.com')
-    # url_main = Url('https://stackoverflow.com/')
+    url_main = Url('https://stackoverflow.com/')
 
     save_file = SaveToFile(url_main.domain)         # класс записи данных в файлы
     save_file.create_directory()                    # создание папки для записи файлов
@@ -32,7 +33,7 @@ def main():
     links_set.add(url_main.url)
 
     count = 0
-    while count < len(urls_deque):
+    while count < len(urls_deque) and timing_all_job.is_limit():
         timing_one_page.start()                     # отсчет времени для обработки одной страницы
 
         current_url = urls_deque[count]
@@ -74,7 +75,6 @@ def main():
                               f'Обработанная страница - {current_url}, '
                               f'Потрачено времени - {timing_one_page.get_timing()} сек.')
 
-
     print(f'Всего ссылок - {len(urls_deque)}')
 
     count = 1
@@ -82,11 +82,13 @@ def main():
         print(f'{count}: {url}')
         count += 1
 
-    # запись результатов в текстовый файл
-    save_file.save_to_links(urls_deque)
+    save_file.save_to_links(urls_deque)             # запись результатов в текстовый файл
 
-    timing_all_job.end()            # конец времени всей работы
+    timing_all_job.end()                            # конец времени всей работы
     print(f'\nВремя выполнения работы: {timing_all_job.get_timing()} сек.')
+    if not timing_all_job.is_limit():
+        print(f'Истек лимит времени на работу программы - {timing_all_job.limit_time} сек.')
+        save_file.save_to_log(f'---------------------Истек лимит времени на работу программы - {timing_all_job.limit_time} сек.')
     save_file.save_to_log(f'---------------------Обработка сайта {url_main.url} завершена {time.asctime()}.\n'
                           f'---------------------Время выполнения работы: {timing_all_job.get_timing()} сек.\n'
                           f'---------------------Всего найдено ссылок - {len(urls_deque)}')

@@ -126,6 +126,7 @@ class Timing:
     def __init__(self):
         self.time_start = float()
         self.time_end = float()
+        self.limit_time = None
 
     def start(self):
         self.time_start = time.time()
@@ -135,6 +136,12 @@ class Timing:
 
     def get_timing(self):
         return round(self.time_end - self.time_start, 4)
+
+    def is_limit(self):
+        """для установки лимита работы программы или цикла"""
+        if self.limit_time is None or (time.time() - self.time_start) < self.limit_time:
+            return True
+        return False
 
 
 class SaveToFile:
